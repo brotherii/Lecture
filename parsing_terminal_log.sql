@@ -1,14 +1,10 @@
 WITH lines AS (--$$ <вставить текст> $$ --иначе спотыкается на кавычках
   SELECT regexp_split_to_table(:log_txt, E'\n') AS line
 )
-,blocks AS (
-  -- Группируем по номеру блока, используя накопление
+,blocks AS (-- Номеруем блоки, используя накопление
   SELECT
- --   trim(replace(line,'|','')) as line,
     trim(regexp_replace(replace(line,'|',''), '\s+', ' ', 'g')) as line,
---    sum(CASE WHEN line ~ 'Execution Time:' THEN 1 ELSE 0 END)
     sum(CASE WHEN line ~ 'fetched.' THEN 1 ELSE 0 END)
---    sum(CASE WHEN line ~ 'QUERY PLAN' THEN 1 ELSE 0 END)
       OVER (ORDER BY ord ROWS UNBOUNDED PRECEDING) + 1 AS block_id
   FROM (
     SELECT line, row_number() OVER () AS ord
@@ -17,7 +13,7 @@ WITH lines AS (--$$ <вставить текст> $$ --иначе спотыка
     and length(line)>10
   ) sub
 )
-,grouped AS (
+,grouped AS (-- Группируем по номеру блока
   SELECT block_id, string_agg(line, E'\n') AS block_text
   FROM blocks
   where
@@ -27,7 +23,7 @@ WITH lines AS (--$$ <вставить текст> $$ --иначе спотыка
   GROUP BY block_id
   ORDER BY block_id
 )
---,parsed AS (
+,parsed AS (-- парсим значения
   select
     row_number() OVER () AS id,
 --    (SELECT line FROM lines WHERE line ILIKE 'select%') AS query_text,
@@ -45,7 +41,6 @@ WITH lines AS (--$$ <вставить текст> $$ --иначе спотыка
     block_id,block_text
   FROM grouped
   where block_text like '%QUERY PLAN%'
-  
 )
 SELECT *
 FROM parsed;

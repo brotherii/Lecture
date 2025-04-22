@@ -18,7 +18,7 @@ SELECT relname AS table_name, indexrelname AS index_name, idx_scan AS index_scan
 FROM pg_stat_user_indexes
 --WHERE idx_scan = 0;
  
-select attname, n_distinct, correlation, null_frac, most_common_vals, most_common_freqs, * 
+select attname, n_distinct, correlation, null_frac, most_common_vals, most_common_freqs, *
 from pg_stats where tablename = 'test_data';
 --analyze test_data; --но что самое интересное, без этой статистики вы отправляете планировщик в увлекательное путешествие по граблям
 
