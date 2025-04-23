@@ -25,5 +25,6 @@ create unique index on public.test_data(a, b, c);
 create unique index on public.test_data(a, b, c) include (d);
  
 
+
 analyze verbose test_data;
 VACUUM (VERBOSE, ANALYZE) test_data;

@@ -1,7 +1,7 @@
 WITH lines AS (--$$ <вставить текст> $$ --иначе спотыкается на кавычках
   SELECT regexp_split_to_table(:log_txt, E'\n') AS line
 )
-,blocks AS (-- Номеруем по номеру блока, используя накопление
+,blocks AS (-- Номеруем блоки, используя накопление
   SELECT
     trim(regexp_replace(replace(line,'|',''), '\s+', ' ', 'g')) as line,
     sum(CASE WHEN line ~ 'fetched.' THEN 1 ELSE 0 END)
@@ -23,7 +23,7 @@ WITH lines AS (--$$ <вставить текст> $$ --иначе спотыка
   GROUP BY block_id
   ORDER BY block_id
 )
-,parsed AS (-- Парсим значения
+,parsed AS (-- парсим значения
   select
     row_number() OVER () AS id
 --    ,(SELECT line FROM lines WHERE line ILIKE 'select%') AS query_text
