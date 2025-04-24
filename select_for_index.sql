@@ -20,13 +20,18 @@ FROM pg_stat_user_indexes
  
 select attname, n_distinct, correlation, null_frac, most_common_vals, most_common_freqs, *
 from pg_stats where tablename = 'test_data';
---analyze test_data; --но что самое интересное, без этой статистики вы отправляете планировщик в увлекательное путешествие по граблям
+--analyze test_data;
+
+ALTER TABLE test_data ADD UNIQUE CONSTRAINT b;
+ALTER TABLE test_data ADD CONSTRAINT uni_b UNIQUE (b);
+
+select * from test_data where b='5';
 
 EXPLAIN (analyze, costs off, timing off,/* summary off,*/ buffers)
 --select a from test_data
 --select a from test_data where a=1
 --select * from test_data where a=1
---select * from test_data where a=1 and b='2'
+select * from test_data where a=1000000 and b='2'
 --select * from test_data where a=1 and ''||b='2'
 --select * from test_data where b='2' and c=true
 --select * from test_data where a=1 and c=true
@@ -37,8 +42,9 @@ EXPLAIN (analyze, costs off, timing off,/* summary off,*/ buffers)
 --select * from test_data where a=1 or  b::int8<5 or c>false
 --select * from test_data where a=1 or  b like '5%' or c>false
 --select * from test_data where (a=1 or c>false) and b like '5%'
-select * from test_data where a=1 or b like '5' or c>false
- 
+--select * from test_data where a=1 or b like '5' or c>false
+
+
 with settings as (
 	select '2021-10-30 22:45:31.794 +0500'::timestamptz as ts
 )
@@ -47,7 +53,8 @@ from public.test_data t , settings s
 where t.d = s.ts
 
 
-CREATE EXTENSION IF NOT EXISTS pg_stat_statements;
-SELECT *--query, calls, total_time 
-FROM pg_stat_statements
-ORDER BY total_time DESC LIMIT 10;
+EXPLAIN (analyze, costs off, timing off,/* summary off,*/ buffers)
+SELECT * FROM test_data
+WHERE d = '2025-04-24'
+
+
