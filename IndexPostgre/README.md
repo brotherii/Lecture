@@ -1,1 +1,1 @@
-Lecture of PostgreSQL (Index, Window, Recursive and etc.)
+Script of index analyze
